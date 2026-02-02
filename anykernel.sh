@@ -10,11 +10,11 @@ do.modules=0
 do.systemless=1
 do.cleanup=1
 do.cleanuponabort=0
-device.name1=r8q
-device.name2=r8qxx
-device.name3=r8qxxx
-device.name4=ossi
-device.name5=komodo
+device.name1=x1q
+device.name2=x1qxx
+device.name3=x1qxxx
+device.name4=
+device.name5=
 supported.versions=11 - 16
 supported.patchlevels=
 '; } # end properties
@@ -54,21 +54,56 @@ case "$ZIPFILE" in
 esac
 
 # begin cmdline changes
+oneui=$(file_getprop /system/build.prop ro.build.version.oneui);
+cos=$(file_getprop /system/build.prop ro.product.system.brand);
 gos=$(file_getprop /system/build.prop ro.build.host);
-if [ $gos == tachyon ]; then
+if [ "$oneui" = "80000" ]; then
+   ui_print " "
+   ui_print " • OneUI 8 ROM Detected • " # OneUI 8.0 real bomb
+   ui_print " "
+   ui_print " • Patching Fingerprint Sensor... • "
+   patch_cmdline "android.is_aosp" "android.is_aosp=0";
+   ui_print " "
+   ui_print " • Patching OTG... • "
+   patch_cmdline "android.is_uos" "android.is_ous=1";
+   ui_print " "
+elif [ -n "$oneui" ]; then
+   ui_print " "
+   ui_print " • OneUI ROM Detected • " # OneUI 7.X/6.X/5.X/4.X/3.X bomb
+   ui_print " "
+   ui_print " • Patching Fingerprint Sensor... • "
+   patch_cmdline "android.is_aosp" "android.is_aosp=0";
+   patch_cmdline "android.is_uos" "android.is_ous=0";
+elif [ "$gos" = "tachyon" ]; then
    ui_print " "
    ui_print " • GrapheneOS detected! • "
    ui_print " "
    ui_print " • Patching SELinux... • "
    patch_cmdline "androidboot.selinux" "androidboot.selinux=permissive";
+   patch_cmdline "android.is_aosp" "android.is_aosp=0";
+   patch_cmdline "android.is_uos" "android.is_ous=0";
    ui_print " "
    ui_print " • Setting android verified boot state to green... • "
    patch_cmdline "ro.boot.verifiedbootstate=orange" "ro.boot.verifiedbootstate=green";
    patch_cmdline "androidboot.verifiedbootstate=orange" "androidboot.verifiedbootstate=green";
+elif [ "$cos" = "oplus" ]; then
+   ui_print " "
+   ui_print " • Oplus ROM detected! • " # Damn
+   ui_print " "
+   ui_print " • Patching SELinux... • "
+   patch_cmdline "androidboot.selinux" "androidboot.selinux=permissive";
+   patch_cmdline "android.is_aosp" "android.is_aosp=1";
+   patch_cmdline "android.is_uos" "android.is_ous=0";
 else
+   ui_print " "
+   ui_print " • AOSP ROM detected! • " # Android 16/15/14/13 veri gud
    ui_print " "
    ui_print " • Spoofing verified boot state to green... • "
    patch_cmdline "ro.boot.verifiedbootstate=orange" "ro.boot.verifiedbootstate=green";
+   ui_print " "
+   ui_print " • Patching Fingerprint Sensor... • "
+   patch_cmdline "android.is_aosp" "android.is_aosp=1";
+   patch_cmdline "android.is_uos" "android.is_ous=0";
 fi
 
 ui_print " "
