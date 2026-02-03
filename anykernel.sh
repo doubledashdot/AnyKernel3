@@ -92,7 +92,7 @@ elif [ "$cos" = "oplus" ]; then
    ui_print " "
    ui_print " • Patching SELinux... • "
    patch_cmdline "androidboot.selinux" "androidboot.selinux=permissive";
-   patch_cmdline "android.is_aosp" "android.is_aosp=0";
+   patch_cmdline "android.is_aosp" "android.is_aosp=1";
    patch_cmdline "android.is_uos" "android.is_ous=0";
 else
    ui_print " "
