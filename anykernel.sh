@@ -13,7 +13,7 @@ do.cleanuponabort=0
 device.name1=r8q
 device.name2=r8qxx
 device.name3=r8qxxx
-device.name4=ossi
+device.name4=a52sxq
 device.name5=komodo
 supported.versions=11 - 16
 supported.patchlevels=
@@ -69,7 +69,7 @@ if [ "$oneui" = "80000" ]; then
    ui_print " "
 elif [ -n "$oneui" ]; then
    ui_print " "
-   ui_print " • OneUI ROM Detected • " # OneUI 7.X/6.X/5.X/4.X/3.X bomb
+   ui_print " • OneUI ROM Detected • " # OneUI 7.X/6.X/5.X/4.X/3.X bomb, Project Lain bess
    ui_print " "
    ui_print " • Patching Fingerprint Sensor... • "
    patch_cmdline "android.is_aosp" "android.is_aosp=0";
@@ -92,7 +92,7 @@ elif [ "$cos" = "oplus" ]; then
    ui_print " "
    ui_print " • Patching SELinux... • "
    patch_cmdline "androidboot.selinux" "androidboot.selinux=permissive";
-   patch_cmdline "android.is_aosp" "android.is_aosp=1";
+   patch_cmdline "android.is_aosp" "android.is_aosp=0";
    patch_cmdline "android.is_uos" "android.is_ous=0";
 else
    ui_print " "
