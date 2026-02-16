@@ -78,8 +78,6 @@ elif [ "$gos" = "tachyon" ]; then
    ui_print " "
    ui_print " • GrapheneOS detected! • "
    ui_print " "
-   ui_print " • Patching SELinux... • "
-   patch_cmdline "androidboot.selinux" "androidboot.selinux=permissive";
    patch_cmdline "android.is_aosp" "android.is_aosp=0";
    patch_cmdline "android.is_uos" "android.is_ous=0";
    ui_print " "
@@ -90,8 +88,6 @@ elif [ "$cos" = "oplus" ]; then
    ui_print " "
    ui_print " • Oplus ROM detected! • " # Damn
    ui_print " "
-   ui_print " • Patching SELinux... • "
-   patch_cmdline "androidboot.selinux" "androidboot.selinux=permissive";
    patch_cmdline "android.is_aosp" "android.is_aosp=1";
    patch_cmdline "android.is_uos" "android.is_ous=0";
 else
@@ -114,6 +110,9 @@ dd if=$home/vbmeta.img of=/dev/block/platform/soc/1d84000.ufshc/by-name/vbmeta
 ui_print " "
 ui_print " • Patching dtbo unconditionally... • "
 dd if=$home/dtbo.img of=/dev/block/platform/soc/1d84000.ufshc/by-name/dtbo
+
+ui_print " • Forcing Permissive SELinux... • "
+patch_cmdline "androidboot.selinux" "androidboot.selinux=permissive";
 
 ui_print " "
 ui_print " • Flashing boot image... • "
