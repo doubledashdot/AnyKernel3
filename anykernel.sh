@@ -10,9 +10,9 @@ do.modules=0
 do.systemless=1
 do.cleanup=1
 do.cleanuponabort=0
-device.name1=gts7l
-device.name2=gts7lxx
-device.name3=gts7lxxx
+device.name1=gts6l
+device.name2=gts6lxx
+device.name3=gts6lxxx
 device.name4=
 device.name5=
 supported.versions=11 - 16
@@ -106,14 +106,14 @@ else
    patch_cmdline "android.is_uos" "android.is_ous=0";
 fi
 
-ui_print " "
-ui_print " • Patching vbmeta unconditionally... • "
-dd if=$home/vbmeta.img of=/dev/block/platform/soc/1d84000.ufshc/by-name/vbmeta
+#ui_print " "
+#ui_print " • Patching vbmeta unconditionally... • "
+#dd if=$home/vbmeta.img of=/dev/block/platform/soc/1d84000.ufshc/by-name/vbmeta
 
 
-ui_print " "
-ui_print " • Patching dtbo unconditionally... • "
-dd if=$home/dtbo.img of=/dev/block/platform/soc/1d84000.ufshc/by-name/dtbo
+#ui_print " "
+#ui_print " • Patching dtbo unconditionally... • "
+#dd if=$home/dtbo.img of=/dev/block/platform/soc/1d84000.ufshc/by-name/dtbo
 
 ui_print " "
 ui_print " • Flashing boot image... • "
