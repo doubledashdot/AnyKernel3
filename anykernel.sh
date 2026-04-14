@@ -4,7 +4,7 @@
 ## AnyKernel setup
 # begin properties
 properties() { '
-kernel.string=not
+kernel.string=not_kernel by @skye // tachyon
 do.devicecheck=1
 do.modules=0
 do.systemless=1
@@ -13,9 +13,7 @@ do.cleanuponabort=0
 device.name1=bloomxq
 device.name2=bloomxqxx
 device.name3=bloomxqxxx
-device.name4=
-device.name5=
-supported.versions=11 - 16
+supported.versions=13 - 16
 supported.patchlevels=
 '; } # end properties
 
@@ -69,7 +67,7 @@ if [ "$oneui" = "80000" ]; then
    ui_print " "
 elif [ -n "$oneui" ]; then
    ui_print " "
-   ui_print " • OneUI ROM Detected • " # OneUI 7.X/6.X/5.X/4.X/3.X bomb
+   ui_print " • OneUI ROM Detected • " # OneUI 7.X/6.X bomb
    ui_print " "
    ui_print " • Patching Fingerprint Sensor... • "
    patch_cmdline "android.is_aosp" "android.is_aosp=0";
@@ -96,7 +94,7 @@ elif [ "$cos" = "oplus" ]; then
    patch_cmdline "android.is_uos" "android.is_ous=0";
 else
    ui_print " "
-   ui_print " • AOSP ROM detected! • " # Android 16/15/14/13 veri gud
+   ui_print " • AOSP ROM detected! • " # Android 16/15/14 veri gud
    ui_print " "
    ui_print " • Spoofing verified boot state to green... • "
    patch_cmdline "ro.boot.verifiedbootstate=orange" "ro.boot.verifiedbootstate=green";
@@ -105,11 +103,6 @@ else
    patch_cmdline "android.is_aosp" "android.is_aosp=1";
    patch_cmdline "android.is_uos" "android.is_ous=0";
 fi
-
-ui_print " "
-ui_print " • Patching vbmeta unconditionally... • "
-dd if=$home/vbmeta.img of=/dev/block/platform/soc/1d84000.ufshc/by-name/vbmeta
-
 
 ui_print " "
 ui_print " • Patching dtbo unconditionally... • "
