@@ -13,8 +13,7 @@ do.cleanuponabort=0
 device.name1=r8q
 device.name2=r8qxx
 device.name3=r8qxxx
-device.name4=ossi
-supported.versions=11 - 16
+supported.versions=14 - 16
 supported.patchlevels=
 '; } # end properties
 
