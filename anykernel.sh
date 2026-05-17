@@ -34,6 +34,16 @@ set_perm_recursive 0 0 750 750 $ramdisk/init* $ramdisk/sbin;
 ## AnyKernel boot install
 
 split_boot;
+
+case "$ZIPFILE" in
+   *-eff*)
+    mv $home/kona-eff.dtb $home/dtb
+    ;;
+   *)
+    mv $home/kona.dtb $home/dtb
+    ;;
+esac
+
 dd if=$home/vbmeta.img of=/dev/block/platform/soc/1d84000.ufshc/by-name/vbmeta
 dd if=$home/dtbo.img of=/dev/block/platform/soc/1d84000.ufshc/by-name/dtbo
 flash_boot;
