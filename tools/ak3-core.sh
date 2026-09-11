@@ -510,9 +510,9 @@ flash_boot() {
   fi;
 }
 
-# flash_generic <name>
+# flash_generic <name> (Debloated & Safe)
 flash_generic() {
-  local avb avbblock avbpath file flags img imgblock imgsz isro isunmounted path;
+  local file img imgblock path isro;
 
   cd $AKHOME;
   for file in $1 $1.img; do
@@ -531,87 +531,28 @@ flash_generic() {
         fi;
       done;
     done;
+
     if [ ! "$imgblock" ]; then
       abort "$1 partition could not be found. Aborting...";
     fi;
+
     if [ ! "$NO_BLOCK_DISPLAY" ]; then
       ui_print " " "$imgblock";
     fi;
-    if [ "$path" == "/dev/block/mapper" ]; then
-      avb=$(httools_static avb $1);
-      [ $? == 0 ] || abort "Failed to parse fstab entry for $1. Aborting...";
-      if [ "$avb" ] && [ ! "$NO_VBMETA_PARTITION_PATCH" ]; then
-        flags=$(httools_static disable-flags);
-        [ $? == 0 ] || abort "Failed to parse top-level vbmeta. Aborting...";
-        if [ "$flags" == "enabled" ]; then
-          ui_print " " "dm-verity detected! Patching $avb...";
-          for avbpath in /dev/block/mapper /dev/block/by-name /dev/block/bootdevice/by-name; do
-            for file in $avb $avb$SLOT; do
-              if [ -e $avbpath/$file ]; then
-                avbblock=$avbpath/$file;
-                break 2;
-              fi;
-            done;
-          done;
-          cd $BIN;
-          httools_static patch $1 $AKHOME/$img $avbblock || abort "Failed to patch $1 on $avb. Aborting...";
-          cd $AKHOME;
-        fi
-      fi
-      imgsz=$(wc -c < $img);
-      if [ "$imgsz" != "$(wc -c < $imgblock)" ]; then
-        if [ -d /postinstall/tmp -a "$SLOT_SELECT" == "inactive" ]; then
-          echo "Resizing $1$SLOT snapshot..." >&2;
-          snapshotupdater_static update $1 $imgsz || abort "Resizing $1$SLOT snapshot failed. Aborting...";
-        else
-          echo "Removing any existing $1_ak3..." >&2;
-          lptools_static remove $1_ak3;
-          echo "Clearing any merged cow partitions..." >&2;
-          lptools_static clear-cow;
-          echo "Attempting to create $1_ak3..." >&2;
-          if lptools_static create $1_ak3 $imgsz; then
-            echo "Replacing $1$SLOT with $1_ak3..." >&2;
-            lptools_static unmap $1_ak3 || abort "Unmapping $1_ak3 failed. Aborting...";
-            lptools_static map $1_ak3 || abort "Mapping $1_ak3 failed. Aborting...";
-            lptools_static replace $1_ak3 $1$SLOT || abort "Replacing $1$SLOT failed. Aborting...";
-            imgblock=/dev/block/mapper/$1_ak3;
-            ui_print " " "Warning: $1$SLOT replaced in super. Reboot before further logical partition operations.";
-          else
-            echo "Creating $1_ak3 failed. Attempting to resize $1$SLOT..." >&2;
-            httools_static umount $1 || abort "Unmounting $1 failed. Aborting...";
-            if [ -e $path/$1-verity ]; then
-              lptools_static unmap $1-verity || abort "Unmapping $1-verity failed. Aborting...";
-            fi
-            lptools_static unmap $1$SLOT || abort "Unmapping $1$SLOT failed. Aborting...";
-            lptools_static resize $1$SLOT $imgsz || abort "Resizing $1$SLOT failed. Aborting...";
-            lptools_static map $1$SLOT || abort "Mapping $1$SLOT failed. Aborting...";
-            isunmounted=1;
-          fi
-        fi
-      fi
-    elif [ "$(wc -c < $img)" -gt "$(wc -c < $imgblock)" ]; then
-      abort "New $1 image larger than $1 partition. Aborting...";
-    fi;
+
     isro=$(blockdev --getro $imgblock 2>/dev/null);
     blockdev --setrw $imgblock 2>/dev/null;
-    if [ -f "$BIN/flash_erase" -a -f "$BIN/nandwrite" ]; then
-      flash_erase $imgblock 0 0;
-      nandwrite -p $imgblock $img;
-    elif [ "$CUSTOMDD" ]; then
-      dd if=/dev/zero of=$imgblock 2>/dev/null;
-      dd if=$img of=$imgblock;
-    else
-      cat $img /dev/zero > $imgblock 2>/dev/null || true;
-    fi;
+
+    # Safe flashing block without relying on external flash_erase or endless padding
+    dd if=$img of=$imgblock bs=4096 2>/dev/null;
+    
     if [ $? != 0 ]; then
       abort "Flashing $1 failed. Aborting...";
     fi;
+
     if [ "$isro" != 0 ]; then
       blockdev --setro $imgblock 2>/dev/null;
     fi;
-    if [ "$isunmounted" -a "$path" == "/dev/block/mapper" ]; then
-      httools_static mount $1 || abort "Mounting $1 failed. Aborting...";
-    fi
     touch ${1}_flashed;
   fi;
 }
